@@ -1,0 +1,91 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include<unordered_map>
+#include<unordered_set>
+
+using namespace std;
+
+//BSF FUNCTION
+void BFS(string start, unordered_map<string, vector<string>> &adj)
+{
+    unordered_set<string> visited;
+    queue<string> q;
+
+    visited.insert(start);
+    q.push(start);
+
+    cout << "BFS Traversal: ";
+
+    while (!q.empty())
+    {
+        string person = q.front();
+        q.pop();
+
+        cout << person << " ";
+
+        for (int i = 0; i < adj[person].size(); i++)
+        {
+            string friendName = adj[person][i];
+
+            if (visited.count(friendName) == 0)
+            {
+                visited.insert(friendName);
+                q.push(friendName);
+            }
+        }
+    }
+    cout << endl;
+}
+
+//DFS
+void DFS(string person, unordered_map<string, vector<string>> &adj,
+    unordered_set<string> &visited)
+{
+    visited.insert(person);
+    cout << person << " ";
+
+    for (int i = 0; i < adj[person].size(); i++)
+    {
+        string friendName = adj[person][i];
+
+        if (visited.count(friendName) == 0)
+        {
+            DFS(friendName, adj, visited);
+        }
+    }
+}
+
+void Social_Media()
+{
+    unordered_map<string, vector<string>> adj;
+
+    // Social connections
+    adj["Raj"]   = {"Sunil", "Neha1"};
+    adj["Sunil"]  = {"Raj", "Akash", "Sneha", "Maya"};
+    adj["Neha1"]  = {"Raj", "Sneha", "Akash", "Aarav"};
+    adj["Priya"] = {"Akash", "Raj", "Aarav"};
+    adj["Aarav"] = {"Neha1", "Arjun1","Neha2"};
+    adj["Sneha"] = {"Sunil","Neha1","Rahul"};
+    adj["Maya"]  = {"Sunil", "Arjun1", "Rahul"};
+    adj["Akash"] = {"Sunil", "Priya"};
+    adj["Neha2"]  = {"Neha1", "Priya", "Rahul"};
+    adj["Rahul"]  = {"Maya", "Sneha", "Neha1", "Neha2", "Arjun1", "Pooja"};
+    adj["Arjun2"]  = {"Maya", "Pooja"};
+    adj["Arjun1"]  = {"Rahul", "Neha2", "Aarav"};
+    adj["Pooja"]  = {"Rahul", "Sneha", "Arjun1"};
+
+    BFS("Raj", adj);
+
+    unordered_set<string> visited;
+    cout << "DFS Traversal: ";
+    DFS("Raj", adj, visited);
+    cout << endl;
+}
+
+int main()
+{
+    Social_Media();
+    return 0;
+}
+
