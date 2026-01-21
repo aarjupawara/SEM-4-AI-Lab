@@ -1,0 +1,126 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+
+using namespace std;
+
+unordered_map<string, vector<pair<string, int>>> adj;
+
+//DFS
+void DFS(string curr, string target, unordered_set<string>& visited, vector<string>& path, int current_cost) {
+    
+    // Base case: reached target
+    if (curr == target) {
+        for (int i = 0; i < (int)path.size(); i++) 
+        {
+            cout << path[i];
+            if (i != (int)path.size() - 1) {
+                cout << " -> ";
+            }
+        }
+        cout << " | Total Cost = " << current_cost << " miles" << endl;
+        return;
+    }
+
+    visited.insert(curr);
+
+    // Loop over all neighbors of the current city
+    for (int i = 0; i < (int)adj[curr].size(); ++i) 
+    {
+        pair<string, int>& edge = adj[curr][i];
+        string nextCity = edge.first;
+        int weight = edge.second;
+
+        // If neighbor is not visited, continue DFS
+        if (visited.find(nextCity) == visited.end()) {
+            path.push_back(nextCity);
+            DFS(nextCity, target, visited, path, current_cost + weight); 
+            path.pop_back(); 
+        }
+    }
+
+    visited.erase(curr);
+}
+
+//BFS
+void BFS(string start, string target) {
+    cout << "\nBFS (Path Costs):\n";
+
+    queue<pair<vector<string>, int>> q;
+    q.push({{start}, 0}); 
+
+    while (!q.empty()) {
+        vector<string> path = q.front().first;
+        int cost = q.front().second;
+        q.pop();
+
+        string last = path.back(); // Last city in current path
+
+        
+        if (last == target) {
+            for (int i = 0; i < (int)path.size(); i++) 
+            {
+                cout << path[i];
+                if (i != (int)path.size() - 1) cout << " -> ";
+            }
+            cout << " | Total Cost = " << cost << " miles" << endl;
+            continue; 
+        }
+
+        for (int i = 0; i < (int)adj[last].size(); ++i) 
+        {
+            pair<string, int>& edge = adj[last][i];
+            string nextCity = edge.first;
+            int weight = edge.second;
+
+            // Check if nextCity is already in path to avoid cycles
+            bool alreadyInPath = false;
+            for (int j = 0; j < (int)path.size(); ++j) {
+                if (path[j] == nextCity) {
+                    alreadyInPath = true;
+                    break; 
+                }
+            }
+
+            // If not in path, add new path to queue
+            if (!alreadyInPath) {
+                vector<string> newPath = path; 
+                newPath.push_back(nextCity);   
+                q.push({newPath, cost + weight});
+            }
+        }
+    }
+}
+
+int main() {
+    
+    adj = {
+        {"Syracuse", {{"Buffalo",150}, {"Boston",312}, {"New York",254}, {"Philadelphia",253}}},
+        {"Buffalo", {{"Syracuse",150}, {"Detroit",256}, {"Cleveland",189}, {"Pittsburgh",215}}},
+        {"Detroit", {{"Buffalo",256}, {"Chicago",283}, {"Cleveland",169}}},
+        {"Chicago", {{"Detroit",283}, {"Cleveland",345}, {"Indianapolis",182}}},
+        {"Cleveland", {{"Chicago",345}, {"Buffalo",189}, {"Pittsburgh",134}, {"Detroit",283}, {"Columbus",144}}},
+        {"Pittsburgh", {{"Cleveland",134}, {"Philadelphia",305}, {"Buffalo",215}, {"Columbus",185}, {"Baltimore",247}}},
+        {"Philadelphia", {{"Pittsburgh",305}, {"New York",97}, {"Baltimore",101}}},
+        {"New York", {{"Philadelphia",97}, {"Boston",215}, {"Providence",181}, {"Syracuse",254}}},
+        {"Boston", {{"New York",215}, {"Portland",107}, {"Providence",50}, {"Syracuse",312}}},
+        {"Indianapolis", {{"Chicago",182}, {"Columbus",176}}},
+        {"Columbus", {{"Indianapolis",176}, {"Pittsburgh",185}, {"Cleveland",144}}},
+        {"Providence", {{"Boston",50}, {"New York",181}}},
+        {"Portland", {{"Boston",107}}}
+    };
+
+    // DFS
+    cout << "DFS (Path Costs):\n";
+    unordered_set<string> visited;
+    vector<string> path = {"Syracuse"};
+    DFS("Syracuse", "Chicago", visited, path, 0);
+
+    // BFS
+    BFS("Syracuse", "Chicago");
+
+    return 0;
+}
