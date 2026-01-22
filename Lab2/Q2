@@ -1,0 +1,62 @@
+start = (7,2,4,
+         5,0,6,
+         8,3,1)
+
+goal  = (0,1,2,
+         3,4,5,
+         6,7,8)
+
+# Custom Stack class
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, item):
+        self.items.append(item)  # add to top
+
+    def pop(self):
+        if not self.is_empty():
+            return self.items.pop()  # remove from top and return
+        return None
+
+    def is_empty(self):
+        return len(self.items) == 0 #empty stack 
+
+def dfs(start, goal, max_depth=30):
+    stack = Stack()
+    stack.push((start, 0, [start]))  # store state, depth, path
+    visited = {start} #set
+    count = 0
+
+    while not stack.is_empty():
+
+        state, depth, path = stack.pop()
+        count += 1
+
+        if state == goal:
+            print("Goal found")
+            print(f"Number of moves to reach goal: {depth}")
+            print(f"Number of states explored: {count}")
+            return count
+        
+        if depth >= max_depth:
+            continue   # stop going deeper
+
+        i = state.index(0)
+        for j in [(i-3),(i+3),(i-1),(i+1)]:
+            # boundary checks
+            if 0 <= j < 9 and not (i%3==0 and j==i-1) and not (i%3==2 and j==i+1):
+                new = list(state)
+                new[i], new[j] = new[j], new[i]
+                new = tuple(new)
+
+                if new not in visited:
+                    visited.add(new)
+                    stack.push((new, depth + 1, path + [new]))
+
+    print("Goal not found within depth limit")
+    print("States explored:", count)
+
+
+# Run DFS
+dfs(start, goal,max_depth=30)
