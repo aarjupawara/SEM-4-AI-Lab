@@ -1,54 +1,69 @@
 import random
 
-gate ="MainGate"
+environment = ["A", "B", "C"]  #set
 
-#percept
-track_values = ["Detected", "Not Detected"]
-obstacle_values = ["Detected", "Not Detected"]
-manual_values = ["Neutral", "Active"]
-
-# Actuators initialization
-actuators = {
-    "gate_arm": "Raise",
-    "hooter": "OFF",
-    "train_signal": "GREEN"
+state = {
+    "A": random.choice(["Clean", "Dirty"]),
+    "B": random.choice(["Clean", "Dirty"]),
+    "C": random.choice(["Clean", "Dirty"])
 }
 
-print("\n")
-print(f"Crossing: {gate}")
-print(f"Initial Actuators State: {actuators}")
-print("\n")
+#initial location 
+start = random.choice(environment)
 
-
-# Random percepts for this step
-percepts = {
-    "track_inbound": random.choice(track_values),
-    "track_outbound": random.choice(track_values),
-    "obstacle": random.choice(obstacle_values)
+#Rewards
+reward_table = {
+    "cleaning": 10,
+    "move": -1,
+    "complete": 20,
+    "time-step": -0.5
 }
 
-# ---------- Reflex Rules ----------
-if percepts["obstacle"] == "Detected":
-    # Rule 1: Emergency stop if obstacle detected
-    actuators["gate_arm"] = "Lower"
-    actuators["hooter"] = "ON"
-    actuators["train_signal"] = "RED"
+total_reward = 0
 
-elif (percepts["track_inbound"] == "Detected" or percepts["track_outbound"] == "Detected") \
-    and percepts["obstacle"] == "Not Detected":
-    # Rule 2: Train detected, no obstacle
-    actuators["gate_arm"] = "Lower"
-    actuators["hooter"] = "ON"
-    actuators["train_signal"] = "GREEN"
+def clean(state):
+    for status in state.values():
+        if status != "Clean":
+            return False
+    return True
 
-else:
-    # Rule 3: No train, no obstacle
-    actuators["gate_arm"] = "Raise"
-    actuators["hooter"] = "OFF"
-    actuators["train_signal"] = "GREEN"
+print("\n")
+print("Initial State:", state)
+print("Initial Location:", start)
+print("\n")
 
+#simulation 
+for step in range(10):
+    percept = (start, state["A"], state["B"],state["C"])
 
+    if state[start] == "Dirty":
+        action = "cleaning"
+        state[start] = "Clean"
+        total_reward+= reward_table["cleaning"]
 
-print(f"Percepts: {percepts}")
-print(f"Actuators: {actuators}")
-   
+    elif clean(state):
+        action = "complete"
+        total_reward+= reward_table["complete"]
+        total_reward+= reward_table["time-step"]
+        print(f"Percept: {percept} | Action: {action} | Location: {start}")
+        break
+
+    else:
+        action = "move"
+        total_reward+= reward_table["move"]
+
+        if start == "A":
+            start = "B" if state["B"] == "Dirty" else "C"
+        elif start == "B":
+            start = "C" if state["C"] == "Dirty" else "A"
+        else:
+            start = "A" if state["A"] == "Dirty" else "B"
+    
+    # Time-step penalty applied every step
+    total_reward += reward_table["time-step"]
+
+    print(f"Percept: {percept} | Action: {action} | Location: {start}")
+
+print("\n")
+print("\n")
+print("Total Reward:", total_reward)
