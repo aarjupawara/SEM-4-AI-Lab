@@ -1,0 +1,54 @@
+import random
+
+gate ="MainGate"
+
+#percept
+track_values = ["Detected", "Not Detected"]
+obstacle_values = ["Detected", "Not Detected"]
+manual_values = ["Neutral", "Active"]
+
+# Actuators initialization
+actuators = {
+    "gate_arm": "Raise",
+    "hooter": "OFF",
+    "train_signal": "GREEN"
+}
+
+print("\n")
+print(f"Crossing: {gate}")
+print(f"Initial Actuators State: {actuators}")
+print("\n")
+
+
+# Random percepts for this step
+percepts = {
+    "track_inbound": random.choice(track_values),
+    "track_outbound": random.choice(track_values),
+    "obstacle": random.choice(obstacle_values)
+}
+
+# ---------- Reflex Rules ----------
+if percepts["obstacle"] == "Detected":
+    # Rule 1: Emergency stop if obstacle detected
+    actuators["gate_arm"] = "Lower"
+    actuators["hooter"] = "ON"
+    actuators["train_signal"] = "RED"
+
+elif (percepts["track_inbound"] == "Detected" or percepts["track_outbound"] == "Detected") \
+    and percepts["obstacle"] == "Not Detected":
+    # Rule 2: Train detected, no obstacle
+    actuators["gate_arm"] = "Lower"
+    actuators["hooter"] = "ON"
+    actuators["train_signal"] = "GREEN"
+
+else:
+    # Rule 3: No train, no obstacle
+    actuators["gate_arm"] = "Raise"
+    actuators["hooter"] = "OFF"
+    actuators["train_signal"] = "GREEN"
+
+
+
+print(f"Percepts: {percepts}")
+print(f"Actuators: {actuators}")
+   
