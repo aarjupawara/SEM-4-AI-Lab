@@ -48,7 +48,6 @@ else:
     actuators["signal"] = "GREEN"
 
 
-
 print(f"Percepts: {percepts}")
 print(f"Actuators: {actuators}")
    
