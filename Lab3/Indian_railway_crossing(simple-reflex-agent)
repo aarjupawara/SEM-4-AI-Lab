@@ -10,8 +10,8 @@ manual_values = ["Neutral", "Active"]
 # Actuators initialization
 actuators = {
     "gate_arm": "Raise",
-    "hooter": "OFF",
-    "train_signal": "GREEN"
+    "alram": "OFF",
+    "signal": "GREEN"
 }
 
 print("\n")
@@ -22,8 +22,8 @@ print("\n")
 
 # Random percepts for this step
 percepts = {
-    "track_inbound": random.choice(track_values),
-    "track_outbound": random.choice(track_values),
+    "train_entering": random.choice(track_values),
+    "train_leaving": random.choice(track_values),
     "obstacle": random.choice(obstacle_values)
 }
 
@@ -31,21 +31,21 @@ percepts = {
 if percepts["obstacle"] == "Detected":
     # Rule 1: Emergency stop if obstacle detected
     actuators["gate_arm"] = "Lower"
-    actuators["hooter"] = "ON"
-    actuators["train_signal"] = "RED"
+    actuators["alram"] = "ON"
+    actuators["signal"] = "RED"
 
-elif (percepts["track_inbound"] == "Detected" or percepts["track_outbound"] == "Detected") \
+elif (percepts["train_entering"] == "Detected" or percepts["train_leaving"] == "Detected") \
     and percepts["obstacle"] == "Not Detected":
     # Rule 2: Train detected, no obstacle
     actuators["gate_arm"] = "Lower"
-    actuators["hooter"] = "ON"
-    actuators["train_signal"] = "GREEN"
+    actuators["alram"] = "ON"
+    actuators["signal"] = "GREEN"
 
 else:
     # Rule 3: No train, no obstacle
     actuators["gate_arm"] = "Raise"
-    actuators["hooter"] = "OFF"
-    actuators["train_signal"] = "GREEN"
+    actuators["alram"] = "OFF"
+    actuators["signal"] = "GREEN"
 
 
 
