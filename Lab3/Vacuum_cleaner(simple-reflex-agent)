@@ -19,7 +19,7 @@ reward_table = {
     "time-step": -0.5
 }
 
-total_reward = 0
+final_reward = 0
 
 def clean(state):
     for status in state.values():
@@ -39,18 +39,18 @@ for step in range(10):
     if state[start] == "Dirty":
         action = "cleaning"
         state[start] = "Clean"
-        total_reward+= reward_table["cleaning"]
+        final_reward+= reward_table["cleaning"]
 
     elif clean(state):
         action = "complete"
-        total_reward+= reward_table["complete"]
-        total_reward+= reward_table["time-step"]
+        final_reward+= reward_table["complete"]
+        final_reward+= reward_table["time-step"]
         print(f"Percept: {percept} | Action: {action} | Location: {start}")
         break
 
     else:
         action = "move"
-        total_reward+= reward_table["move"]
+        final_reward+= reward_table["move"]
 
         if start == "A":
             start = "B" if state["B"] == "Dirty" else "C"
@@ -60,10 +60,10 @@ for step in range(10):
             start = "A" if state["A"] == "Dirty" else "B"
     
     # Time-step penalty applied every step
-    total_reward += reward_table["time-step"]
+    final_reward += reward_table["time-step"]
 
     print(f"Percept: {percept} | Action: {action} | Location: {start}")
 
 print("\n")
 print("\n")
-print("Total Reward:", total_reward)
+print("Final Reward:", final_reward)
